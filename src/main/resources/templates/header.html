@@ -2,8 +2,12 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" th:href="@{/}">TODOs List</a>
+                <a class="navbar-brand" th:href="@{/}">Home Page</a>
             </div>
         </div>
     </nav>
+
+    <form action="/logout" method="POST">
+        <button type="submit">Logout</button>
+    </form>
 </div>
