@@ -21,7 +21,7 @@ public class UserController {
         this.userService = userService;
         this.roleService = roleService;
     }
-
+    @PreAuthorize("hasAuthority('ADMIN') or isAnonymous()")
     @GetMapping("/create")
     public String create(Model model) {
         model.addAttribute("user", new User());
