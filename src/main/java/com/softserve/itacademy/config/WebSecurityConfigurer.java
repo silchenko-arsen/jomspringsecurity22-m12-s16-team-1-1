@@ -1,7 +1,6 @@
 package com.softserve.itacademy.config;
 
 import com.softserve.itacademy.exception.SecurityAccessDeniedHandler;
-import com.softserve.itacademy.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -22,11 +22,13 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
-    private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final UserDetailsService userDetailsService;
+    private final SecurityAccessDeniedHandler securityAccessDeniedHandler;
 
     @Autowired
-    public WebSecurityConfigurer(@Qualifier("userDetailsServiceImpl") UserDetailsServiceImpl userDetailsServiceImpl) {
-        this.userDetailsServiceImpl = userDetailsServiceImpl;
+    public WebSecurityConfigurer(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService, SecurityAccessDeniedHandler securityAccessDeniedHandler) {
+        this.userDetailsService = userDetailsService;
+        this.securityAccessDeniedHandler = securityAccessDeniedHandler;
     }
 
     @Override
@@ -70,7 +72,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     protected DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        daoAuthenticationProvider.setUserDetailsService(userDetailsServiceImpl);
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         return daoAuthenticationProvider;
     }
 }
