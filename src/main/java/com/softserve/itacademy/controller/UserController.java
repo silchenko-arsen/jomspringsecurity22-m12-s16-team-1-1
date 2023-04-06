@@ -80,7 +80,7 @@ public class UserController {
         userService.delete(id);
         return "redirect:/users/all";
     }
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/all")
     public String getAll(Model model) {
         model.addAttribute("users", userService.getAll());
