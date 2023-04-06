@@ -40,15 +40,15 @@ public class UserController {
     }
 
     @GetMapping("/{id}/read")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN') or #id==authentication.principal.id")
     public String read(@PathVariable long id, Model model) {
         User user = userService.readById(id);
         model.addAttribute("user", user);
         return "user-info";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or #id==authentication.principal.id")
     @GetMapping("/{id}/update")
-    @PreAuthorize("hasAuthority('ADMIN') or #ownerId=authentication.principal.id")
     public String update(@PathVariable long id, Model model) {
         User user = userService.readById(id);
         model.addAttribute("user", user);
@@ -58,7 +58,7 @@ public class UserController {
 
 
     @PostMapping("/{id}/update")
-    @PreAuthorize("hasAuthority('ADMIN') or #ownerId=authentication.principal.id")
+    @PreAuthorize("hasAuthority('ADMIN') or #id==authentication.principal.id")
     public String update(@PathVariable long id, Model model, @Validated @ModelAttribute("user") User user, @RequestParam("roleId") long roleId, BindingResult result) {
         User oldUser = userService.readById(id);
         if (result.hasErrors()) {
@@ -76,15 +76,14 @@ public class UserController {
     }
 
 
-    @GetMapping("/{id}/delete")
-    @PreAuthorize("hasAuthority('ADMIN') or #ownerId=authentication.principal.id")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String delete(@PathVariable("id") long id) {
         userService.delete(id);
         return "redirect:/users/all";
     }
 
     @GetMapping("/all")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String getAll(Model model) {
         model.addAttribute("users", userService.getAll());
         return "users-list";
