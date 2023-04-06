@@ -28,9 +28,7 @@ public class TaskController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or " +
-            "principal.id==@toDoServiceImpl.readById(#todoId).owner.id or " +
-            "@toDoServiceImpl.readById(#todoId).collaborators" +
-            ".contains(@userServiceImpl.readById(principal.id))")
+            "principal.id==@toDoServiceImpl.readById(#todoId).owner.id")
     @GetMapping("/create/todos/{todo_id}")
     public String create(@PathVariable("todo_id") long todoId, Model model) {
         model.addAttribute("task", new TaskDto());
@@ -40,9 +38,7 @@ public class TaskController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or " +
-            "principal.id==@toDoServiceImpl.readById(#todoId).owner.id or " +
-            "@toDoServiceImpl.readById(#todoId).collaborators" +
-            ".contains(@userServiceImpl.readById(principal.id))")
+            "principal.id==@toDoServiceImpl.readById(#todoId).owner.id")
     @PostMapping("/create/todos/{todo_id}")
     public String create(@PathVariable("todo_id") long todoId, Model model,
                          @Validated @ModelAttribute("task") TaskDto taskDto, BindingResult result) {
@@ -61,9 +57,7 @@ public class TaskController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or " +
-            "principal.id==@toDoServiceImpl.readById(#todoId).owner.id or " +
-            "@toDoServiceImpl.readById(#todoId).collaborators" +
-            ".contains(@userServiceImpl.readById(principal.id))")
+            "principal.id==@toDoServiceImpl.readById(#todoId).owner.id")
     @GetMapping("/{task_id}/update/todos/{todo_id}")
     public String update(@PathVariable("task_id") long taskId, @PathVariable("todo_id") long todoId, Model model) {
         TaskDto taskDto = TaskTransformer.convertToDto(taskService.readById(taskId));
@@ -74,9 +68,7 @@ public class TaskController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or " +
-            "principal.id==@toDoServiceImpl.readById(#todoId).owner.id or " +
-            "@toDoServiceImpl.readById(#todoId).collaborators" +
-            ".contains(@userServiceImpl.readById(principal.id))")
+            "principal.id==@toDoServiceImpl.readById(#todoId).owner.id")
     @PostMapping("/{task_id}/update/todos/{todo_id}")
     public String update(@PathVariable("task_id") long taskId, @PathVariable("todo_id") long todoId, Model model,
                          @Validated @ModelAttribute("task")TaskDto taskDto, BindingResult result) {
@@ -94,9 +86,7 @@ public class TaskController {
         return "redirect:/todos/" + todoId + "/tasks";
     }
     @PreAuthorize("hasAuthority('ADMIN') or " +
-            "principal.id==@toDoServiceImpl.readById(#todoId).owner.id or " +
-            "@toDoServiceImpl.readById(#todoId).collaborators" +
-            ".contains(@userServiceImpl.readById(principal.id))")
+            "principal.id==@toDoServiceImpl.readById(#todoId).owner.id")
     @GetMapping("/{task_id}/delete/todos/{todo_id}")
     public String delete(@PathVariable("task_id") long taskId, @PathVariable("todo_id") long todoId) {
         taskService.delete(taskId);
