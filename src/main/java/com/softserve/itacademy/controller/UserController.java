@@ -75,7 +75,7 @@ public class UserController {
         return "redirect:/users/" + id + "/read";
     }
 
-
+    @GetMapping("/{id}/delete")
     @PreAuthorize("hasAuthority('ADMIN')")
     public String delete(@PathVariable("id") long id) {
         userService.delete(id);
