@@ -31,8 +31,8 @@ public class ToDoController {
         this.userService = userService;
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or #ownerId==authentication.principal.id")
     @GetMapping("/create/users/{owner_id}")
-    @PreAuthorize("hasAuthority('ADMIN') or #userId==authentication.principal.id")
     public String create(@PathVariable("owner_id") long ownerId, Model model) {
         model.addAttribute("todo", new ToDo());
         model.addAttribute("ownerId", ownerId);
@@ -40,7 +40,7 @@ public class ToDoController {
     }
 
     @PostMapping("/create/users/{owner_id}")
-    @PreAuthorize("hasAuthority('ADMIN') or #userId==authentication.principal.id")
+    @PreAuthorize("hasAuthority('ADMIN') or #ownerId==authentication.principal.id")
     public String create(@PathVariable("owner_id") long ownerId, @Validated @ModelAttribute("todo") ToDo todo, BindingResult result) {
         if (result.hasErrors()) {
             return "create-todo";
@@ -52,7 +52,10 @@ public class ToDoController {
     }
 
     @GetMapping("/{id}/tasks")
-    @PreAuthorize("hasAuthority('ADMIN') or #userId==authentication.principal.id")
+    @PreAuthorize("hasAuthority('ADMIN') or " +
+            "principal.id==@toDoServiceImpl.readById(#id).owner.id or " +
+            "@toDoServiceImpl.readById(#id).collaborators" +
+            ".contains(@userServiceImpl.readById(principal.id))")
     public String read(@PathVariable long id, Model model) {
         ToDo todo = todoService.readById(id);
         List<Task> tasks = taskService.getByTodoId(id);
@@ -95,7 +98,7 @@ public class ToDoController {
     }
 
     @GetMapping("/all/users/{user_id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN') or #userId==authentication.principal.id")
     public String getAll(@PathVariable("user_id") long userId, Model model) {
         List<ToDo> todos = todoService.getByUserId(userId);
         model.addAttribute("todos", todos);
@@ -104,7 +107,7 @@ public class ToDoController {
     }
 
     @GetMapping("/{id}/add")
-    @PreAuthorize("hasAuthority('ADMIN') or #userId==authentication.principal.id")
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.principal.id==@toDoServiceImpl.readById(#id).owner.id")
     public String addCollaborator(@PathVariable long id, @RequestParam("user_id") long userId) {
         ToDo todo = todoService.readById(id);
         List<User> collaborators = todo.getCollaborators();
@@ -115,7 +118,7 @@ public class ToDoController {
     }
 
     @GetMapping("/{id}/remove")
-    @PreAuthorize("hasAuthority('ADMIN') or #userId==authentication.principal.id")
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.principal.id==@toDoServiceImpl.readById(#id).owner.id")
     public String removeCollaborator(@PathVariable long id, @RequestParam("user_id") long userId) {
         ToDo todo = todoService.readById(id);
         List<User> collaborators = todo.getCollaborators();
